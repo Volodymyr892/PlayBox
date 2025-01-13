@@ -1,5 +1,6 @@
 import { useState } from "react"
 import PlayerStore from "../../store/playerStore";
+import css from "./PlayList.module.css"
 
 export default function PlayList(){
     const [newSource, setNewSource] = useState('');
@@ -12,17 +13,18 @@ export default function PlayList(){
         }
     }
     return(
-        <div>
-                <input 
+        <div className={css.container}>
+            <input 
+                className={css.input}
                 type="text" 
                 value={newSource}
                 onChange={(e)=> setNewSource(e.target.value)}
                 placeholder="Add video"
                 />
-            <button type="submit" onClick={handleAddSource}>Add </button>
-            <ul>
+            <button className={css.button} type="submit" onClick={handleAddSource}>Add </button>
+            <ul className={css.list}>
                 {playlist.map((item,index)=>(
-                <li key={index} onClick={()=> setSource(item)}>
+                <li className={css.item} key={index} onClick={()=> setSource(item)}>
                     {item}
                 </li>
                 ))}
