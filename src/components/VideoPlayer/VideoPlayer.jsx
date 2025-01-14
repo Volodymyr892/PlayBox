@@ -3,18 +3,28 @@ import videojs from "video.js";
 import 'video.js/dist/video-js.css';
 import PlayerStore from "../../store/playerStore";
 import css from "./VideoPlayer.module.css"
+import  forward from "../../assets/forward.svg"
+import back from "../../assets/back.svg"
+import pusc from '../../assets/pusc.svg'
+import pause from "../../assets/pause.svg"
+import volumeSvg from "../../assets/Volume.svg"
+import fullScreen from "../../assets/fullScreen.svg"
 
 
 export default function VideoPlayer(){
     const videoRef = useRef(null);
     const playerRef = useRef(null); 
-    const {source, setPlaybackState, volume, setVolume } = PlayerStore();
+    const {source,setSource, setPlaybackState, volume, setVolume,playlist } = PlayerStore();
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [showVolume, setShowVolume] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(()=>{
         const timeout = setTimeout(()=>{
+            console.log("Playlist:", playlist);
+            console.log("Current Source:", source);
             if (!playerRef.current) {
                 playerRef.current = videojs(videoRef.current, {
                 autoplay: false,
@@ -29,17 +39,26 @@ export default function VideoPlayer(){
                     progressControl: true, 
                 },
                 });
+                playerRef.current.on("ended", handleVideoEnd);
                 playerRef.current.on("timeupdate", () => {
                     setCurrentTime(playerRef.current.currentTime());
                 });
                 playerRef.current.on("loadedmetadata", () => {
                     setDuration(playerRef.current.duration());
                 });
-                playerRef.current.on('play', () => setPlaybackState(true));
-                playerRef.current.on('pause', () => setPlaybackState(false));
+                playerRef.current.on('play', () => {
+                    setPlaybackState(true);
+                    setIsPlaying(true);
+                });
+                playerRef.current.on('pause', () => {
+                    setPlaybackState(false);
+                    setIsPlaying(false);
+                });
                 } else {
-                playerRef.current.src({ src: source, type: 'video/mp4' });
-                playerRef.current.play();
+                    if (playerRef.current && playerRef.current.src()!== source) {
+                        playerRef.current.src({ src: source, type: 'video/mp4' });
+                        playerRef.current.play();
+                    }
                 }
 
         return()=>{
@@ -52,89 +71,118 @@ export default function VideoPlayer(){
     return () => clearTimeout(timeout);
     },[source, setPlaybackState, setVolume ])
 
-    const handlePlayPause = () => {
+
+    //*------ автопермикання---------------/
+    const handleVideoEnd = () => {
+        let nextIndex = currentIndex + 1;
+    if (nextIndex >= playlist.length) {
+        nextIndex = 0; 
+    }
+
+    const nextSource = playlist[nextIndex];
+    
+    setCurrentIndex(nextIndex);
+    setSource(nextSource);
+
+};
+    // *------Перемотування----------------/
+    const handleRewind = () => {
+        if (playerRef.current) {
+            playerRef.current.currentTime(playerRef.current.currentTime() - 5); 
+        }
+    };
+    const handleFastForward = () => {
+        if (playerRef.current) {
+            playerRef.current.currentTime(playerRef.current.currentTime() + 5); 
+        }
+    };
+    // *--------Пауза-Пуск---------------/
+        const handlePlayPause = () => {
         if (playerRef.current.paused()) {
             playerRef.current.play();
         } else {
             playerRef.current.pause();
         }
     };
-
-    const handleVolumeChange = (e) => {
-        const newVolume = parseFloat(e.target.value);
-        playerRef.current.volume(newVolume);
-        setVolume(newVolume);
-    };
-    const handleRewind = () => {
-        if (playerRef.current) {
-            playerRef.current.currentTime(playerRef.current.currentTime() - 5); // Перемотка на 10 секунд назад
-        }
-    };
     
-    const handleFastForward = () => {
-        if (playerRef.current) {
-            playerRef.current.currentTime(playerRef.current.currentTime() + 5); // Перемотка на 10 секунд вперед
-        }
-    };
-
-    const toggleVolumePanel = () => {
-        setShowVolume((prev) => !prev);
-    };
-
-    const handleFullscreen = () => {
-        playerRef.current.requestFullscreen();
-    };
-
+    // *--------Формат часу -------------/
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
         const seconds = Math.floor(time % 60).toString().padStart(2, "0");
         return `${minutes}:${seconds}`;
     };
 
-    
+    // *--------Гучність-----------------/
+    const handleVolumeChange = (e) => {
+        const newVolume = parseFloat(e.target.value);
+        playerRef.current.volume(newVolume);
+        setVolume(newVolume);
+        const volumeBar = e.target;
+        const value = (volumeBar.value - volumeBar.min) / (volumeBar.max - volumeBar.min) * 100;
+        volumeBar.style.setProperty("--value", `${value}%`);
+    };
+    const toggleVolumePanel = () => {
+        setShowVolume((prev) => !prev);
+    };
+    // *--------Повноекранний режим-----/
+    const handleFullscreen = () => {
+        playerRef.current.requestFullscreen();
+    };
+
+
     return(
         <div className={css.container}>
         <video 
         width="626"
-        height="360"  
+        height="347"  
         ref={videoRef} 
         className="video-js vjs-default-skin" 
         />
 
         <div className={css.videoControls}>
-            <div>
+
+            <div className={css.containerBtn}>
                 <button onClick={handleRewind} className={css.controlButton}>
-                    ⏪
+                    <img src={back} alt="back" />
                 </button>
                 <button onClick={handlePlayPause} className={css.controlButton}>
-                    {playerRef.current && playerRef.current.paused() ? "▶" : "⏸"}
+                {isPlaying ? (
+                    <img src={pause} alt="pause" width={16} />
+                ) : (
+                    <img src={pusc} alt="play" />
+                )}
                 </button>
                 <button onClick={handleFastForward} className={css.controlButton}>
-                    ⏩
+                    <img src={forward} alt="forvard" />
                 </button>
-            </div>
-            <span className={css.timeDisplay}>
+                <p className={css.timeDisplay}>
                 {formatTime(currentTime)} / {formatTime(duration)}
-            </span>
-            <div className={css.volumeContainer}>
-                <button onClick={toggleVolumePanel} className={css.controlButton}>
-                    🔊
-                </button>
-                {showVolume && (
-                    <input
-                        type="range"
-                        className={css.volumeBar}
-                        min="0"
-                        max="1"
-                        step="0.1"
-                        value={volume}
-                        onChange={handleVolumeChange}
-                    />
-                )}
+                </p>
             </div>
-            <button onClick={handleFullscreen} className="control-button">
-                ⛶
-            </button>
+
+            <div className={css.contoinerVolume}>
+                <div className={css.volumeContainer}>
+                    <button onClick={toggleVolumePanel} className={css.controlButton}>
+                        <img src={volumeSvg} alt="volome" />
+                    </button>
+                    {showVolume && (
+                        <div className={css.containerRange}>
+                            <input
+                                type="range"
+                                className={css.volumeBar}
+                                min="0"
+                                max="1"
+                                step="0.1"
+                                value={volume}
+                                onChange={handleVolumeChange}
+                            />
+                        </div>
+                    )}
+                </div>
+                <button onClick={handleFullscreen} className={css.controlButton}>
+                    <img src={fullScreen} alt="fullScreen" />
+                </button>
+            </div>
     </div>
 </div>
 )}

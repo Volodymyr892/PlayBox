@@ -1,5 +1,6 @@
 .container {
     display: flex;
+    gap: 12px;
     flex-direction: column;
     align-items: center;
     width: 100%;
@@ -25,9 +26,7 @@
 }
 
 :global(.vjs-progress-control) {
-    width: 100%; /* Ширина прогрес-бару */
-    height: 3px; 
-    background-color: #e0e0e0;
+    width: 100%; 
     border-radius: 4px; 
     position: relative;
     overflow: hidden; 
@@ -38,13 +37,14 @@
 }
 
 .videoControls {
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 12px;
     width: 626px;
     height: 39px;
-    background: #333;
+    background: transparent;
     color: #fff;
 }
 
@@ -61,11 +61,53 @@
 }
 
 .volumeBar {
-    width: 100px;
-    margin-left: 10px;
+    width: 100px;  
+    -webkit-appearance: none; 
+    appearance: none;
+    height: 4px;
+    background: linear-gradient(to right, #fa3535 var(--value), rgb(177, 177, 177) var(--value));
+    border-radius: 2px;
+    outline: none;
+    position: relative;
 }
 
-.timeDisplay {
-    font-size: 14px;
-    margin-right: 10px;
+
+.volumeBar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: #fa5e5e; 
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+.volumeBar::-webkit-slider-thumb:hover {
+    background: #fa3535;
+}
+
+
+.timeDisplay {font-family: var(--second-family);
+    font-weight: 500;
+    font-size: 10px;
+    line-height: 2.4;
+    letter-spacing: 0.07em;
+    color:  #212121
+}
+.controlButton{
+border: none;
+}
+.contoinerVolume{
+display: flex;
+gap:22px;
+}
+.containerBtn{
+    display: flex;
+    gap: 17px;
+}
+.volumeContainer{
+    display: flex;
+    gap: 5px;
 }
