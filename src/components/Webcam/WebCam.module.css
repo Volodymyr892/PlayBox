@@ -1,0 +1,17 @@
+.container{
+    box-sizing: border-box;
+}
+.button{
+    margin-top: 12px;
+    border-radius: 15px;
+    cursor: pointer;
+    border: none;
+    height: 35px;
+    padding: 0 27px;
+    background-color: rgb(255, 119, 119);
+    font-size: 15px;
+    color: #fff;
+}
+.button:hover{
+    background-color: rgb(253, 85, 85);
+}

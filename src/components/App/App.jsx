@@ -8,13 +8,12 @@ export default function App(){
     const {useWebCam} = PlayerStore();
   return (
     <div className={css.container}>
-    <div className={css.containerPlayerList}>
-    {useWebCam ? <WebCam /> : <VideoPlayer />}
-      <div>
-        <PlayList/>
+      <div className={css.containerPlayerList}>
+      {useWebCam ? <WebCam /> : <VideoPlayer />}
+        <div>
+          <PlayList/>
+        </div>
       </div>
-    </div>
-
   </div>
   )
 }

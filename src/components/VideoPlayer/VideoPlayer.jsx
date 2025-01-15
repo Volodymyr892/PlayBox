@@ -14,12 +14,17 @@ import fullScreen from "../../assets/fullScreen.svg"
 export default function VideoPlayer(){
     const videoRef = useRef(null);
     const playerRef = useRef(null); 
-    const {source,setSource, setPlaybackState, volume, setVolume,playlist } = PlayerStore();
+    const {source,
+        setPlaybackState, 
+        volume, 
+        setVolume, 
+        playlist, 
+        handleVideoEnd 
+    } = PlayerStore();
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [showVolume, setShowVolume] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(()=>{
         const timeout = setTimeout(()=>{
@@ -69,22 +74,9 @@ export default function VideoPlayer(){
         };
     },0)
     return () => clearTimeout(timeout);
-    },[source, setPlaybackState, setVolume ])
+    },[source, setPlaybackState, setVolume, handleVideoEnd ])
 
 
-    //*------ автопермикання---------------/
-    const handleVideoEnd = () => {
-        let nextIndex = currentIndex + 1;
-    if (nextIndex >= playlist.length) {
-        nextIndex = 0; 
-    }
-
-    const nextSource = playlist[nextIndex];
-    
-    setCurrentIndex(nextIndex);
-    setSource(nextSource);
-
-};
     // *------Перемотування----------------/
     const handleRewind = () => {
         if (playerRef.current) {
@@ -96,6 +88,7 @@ export default function VideoPlayer(){
             playerRef.current.currentTime(playerRef.current.currentTime() + 5); 
         }
     };
+
     // *--------Пауза-Пуск---------------/
         const handlePlayPause = () => {
         if (playerRef.current.paused()) {
@@ -124,11 +117,11 @@ export default function VideoPlayer(){
     const toggleVolumePanel = () => {
         setShowVolume((prev) => !prev);
     };
+
     // *--------Повноекранний режим-----/
     const handleFullscreen = () => {
         playerRef.current.requestFullscreen();
     };
-
 
     return(
         <div className={css.container}>

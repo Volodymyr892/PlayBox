@@ -16,6 +16,7 @@ li {
     width: 944px;
     margin: 0 auto;
     background-color:#f3f4f6;
+    height: 100vh;
 }
 .containerPlayerList{
     margin-top: 20px;

@@ -19,7 +19,6 @@ overflow: hidden;
 overflow-y: auto; 
 }
 .list::-webkit-scrollbar {
-    /* margin-right: 5px; */
     width: 4px;
 
 }
@@ -91,7 +90,7 @@ margin-bottom: 13px;
   .toggleButton{
     cursor: pointer;
     border: none;
-    margin-top: 12px;
+    margin-top: 15px;
     background-color: rgb(255, 119, 119);
     font-size: 15px;
     color: #fff;
@@ -99,6 +98,9 @@ margin-bottom: 13px;
     height: 35px;
     border-radius: 15px;
   }
+  .toggleButton:hover{
+    background-color: rgb(253, 85, 85);
+}
   .containerFotoName{
     display: flex;
     gap: 12px;

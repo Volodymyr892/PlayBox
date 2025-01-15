@@ -8,8 +8,15 @@ export default function PlayList(){
     const [newSource, setNewSource] = useState('');
     const [error, setError] = useState("");
     const [durations, setDurations] = useState({});
-    const [activeSource, setActiveSource] = useState("");
-    const {playlist, setSource, addSource,toggleWebCam, useWebCam} = PlayerStore();
+    const {
+        playlist,
+        setSource, 
+        addSource,
+        toggleWebCam, 
+        useWebCam,  
+        activeSource, 
+        setActiveSource
+    } = PlayerStore();
 
     useEffect(() => {
         playlist.forEach((source) => {
@@ -18,6 +25,8 @@ export default function PlayList(){
             }
         });
         } , [playlist]);
+
+        // *------Вaлідація інтупу-----/
 
     const validateSource = (source) => {
         const urlRegex = /^(https?:\/\/)?([\w\d-]+\.)+[\w-]+(\/[\w\d-./?%&=]*)?$/;
@@ -33,6 +42,7 @@ export default function PlayList(){
         return "";
         };
 
+        // *------додавання нового відео-----/
         const handleAddSource = () => {
         const validationError = validateSource(newSource);
         if (validationError) {
@@ -44,6 +54,8 @@ export default function PlayList(){
             fetchVideoDuration(newSource);
         }
         };
+
+        //*---Отримання тривалості відео----/
         const fetchVideoDuration = (source) => {
             const video = document.createElement("video");
         video.src = source;
@@ -60,13 +72,15 @@ export default function PlayList(){
                 }));
             });
         };
-    
+
+        // *-------Функція для перетворення часу в формат 00:00---/
             const formatDuration = (seconds) => {
                 const mins = Math.floor(seconds / 60);
                 const secs = Math.floor(seconds % 60);
                 return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
             };
 
+        // *-------Для додавання галочки до відео яке відтворюється----/
             const handleSelectSource =  useCallback((source) => {
                 if (source !== activeSource) {
                 setSource(source);
@@ -98,7 +112,9 @@ export default function PlayList(){
                                 alt="foto"
                                 />
                                 <div className={css.containerName}>
-                                    <p className={css.title}>{item}</p>
+                                    <p className={css.title}>
+                                        {item.length > 30 ? `${item.slice(0, 30)}...` : item}
+                                    </p>
                                     <p className={css.time}>
                                         {durations[item] ? durations[item] : "Loading..."}
                                     </p>
